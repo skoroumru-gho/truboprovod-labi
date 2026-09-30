@@ -188,60 +188,41 @@ void editKS(KS &k)
     }
 }
 
-void saveData(Truba t, KS k) 
+void saveTruba(Truba t, ofstream &fout) 
 {
-    string filename;
-    cout << "Введите имя файла: ";
-    cin >> filename;
-    
-    ofstream fout(filename);
-    if (!fout.is_open()) 
-    {
-        cout << "Ошибка открытия файла!\n";
-        return;
-    }
-    
     fout << t.name << endl;
     fout << t.dlina << endl;
     fout << t.diametr << endl;
     fout << t.remont << endl;
+}
+
+void saveKS(KS k, ofstream &fout) 
+{
     fout << k.name << endl;
     fout << k.cehov_vsego << endl;
     fout << k.cehov_rabot << endl;
     fout << k.klass << endl;
-    
-    fout.close();
-    cout << "Сохранено.\n";
 }
 
-void loadData(Truba &t, KS &k) 
+void loadTruba(Truba &t, ifstream &fin) 
 {
-    string filename;
-    cout << "Введите имя файла: ";
-    cin >> filename;
-    
-    ifstream fin(filename);
-    if (!fin.is_open()) {
-        cout << "Файл не найден.\n";
-        return;
-    }
-    
     getline(fin, t.name);
     fin >> t.dlina;
     fin >> t.diametr;
     fin >> t.remont;
-    fin.ignore();
-    
+    fin.ignore(); 
+}
+
+void loadKS(KS &k, ifstream &fin) 
+{
     getline(fin, k.name);
     fin >> k.cehov_vsego;
     fin >> k.cehov_rabot;
     fin >> k.klass;
-    
-    fin.close();
-    cout << "Загружено.\n";
 }
 
-int main() {
+int main() 
+{
     Truba mojaTruba;
     KS mojaKS;
     int menu = -1;
@@ -286,13 +267,39 @@ int main() {
         {
             editKS(mojaKS);
         }
-        else if (menu == 6) 
+       else if (menu == 6) 
         {
-            saveData(mojaTruba, mojaKS);
+            string filename;
+            cout << "Введите имя файла: ";
+            cin >> filename;
+    
+            ofstream fout(filename); 
+            if (!fout.is_open()) {
+                cout << "Ошибка открытия файла!\n";
+            } else {
+                saveTruba(mojaTruba, fout); 
+                saveKS(mojaKS, fout);       
+                fout.close();              
+                cout << "Сохранено.\n";
+            }
         }
         else if (menu == 7) 
         {
-            loadData(mojaTruba, mojaKS);
+            string filename;
+            cout << "Введите имя файла: ";
+            cin >> filename;
+            
+            ifstream fin(filename);
+            if (!fin.is_open()) 
+            {
+                cout << "Файл не найден.\n";
+            } else 
+            {
+                loadTruba(mojaTruba, fin); 
+                loadKS(mojaKS, fin);       
+                fin.close();
+                cout << "Загружено.\n";
+            }
         }
         else if (menu == 0) 
         {
