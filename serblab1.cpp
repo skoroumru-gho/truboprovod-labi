@@ -1,150 +1,51 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <limits> 
 
 using namespace std;
 
-// Описываем трубу
-struct Truba {
+struct Truba 
+{
     string name;
     double dlina;
     double diametr;
-    bool remont; // true = в ремонте, false = работает
+    bool remont;
 };
 
-// Описываем компрессорную станцию (КС)
-struct KS {
+struct KS 
+{
     string name;
     int cehov_vsego;
     int cehov_rabot;
     int klass;
 };
 
-// Функция для добавления трубы
-void addTruba(Truba &t) {
-    cout << "Введите название трубы: ";
-    cin >> t.name;
-    cout << "Введите длину (км): ";
-    cin >> t.dlina;
-    cout << "Введите диаметр (мм): ";
-    cin >> t.diametr;
-    t.remont = false; // Новая труба всегда исправна
-}
-
-// Функция для добавления КС
-void addKS(KS &k) {
-    cout << "Введите название КС: ";
-    cin >> k.name;
-    cout << "Введите количество цехов всего: ";
-    cin >> k.cehov_vsego;
-    cout << "Введите количество цехов в работе: ";
-    cin >> k.cehov_rabot;
-    cout << "Введите класс станции: ";
-    cin >> k.klass;
-}
-
-// Функция для вывода
-void show(Truba t, KS k) {
-    cout << "\n--- Труба ---\n";
-    cout << "Название: " << t.name << endl;
-    cout << "Длина: " << t.dlina << " км" << endl;
-    cout << "Диаметр: " << t.diametr << " мм" << endl;
-    if (t.remont == true) 
+bool checkInput(double &x) 
+{
+    if (cin >> x && cin.peek() == '\n' && x > 0) 
     {
-        cout << "Статус: В ремонте" << endl;
-    } else {
-        cout << "Статус: Работает" << endl;
-    }
-
-    cout << "\n--- КС ---\n";
-    cout << "Название: " << k.name << endl;
-    cout << "Цехов всего: " << k.cehov_vsego << endl;
-    cout << "Цехов в работе: " << k.cehov_rabot << endl;
-    cout << "Класс: " << k.klass << endl;
-}
-
-// Функция изменения ремонта трубы
-void editTruba(Truba &t) {
-    if (t.remont == true) 
+        return true;
+    } else 
     {
-        t.remont = false;
-        cout << "Труба теперь работает.\n";
-    } 
-    else 
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
+        return false;
+    }
+}
+bool checkInputt(int &x) 
+{
+    if (cin >> x && cin.peek() == '\n' && x >= 0) 
     {
-        t.remont = true;
-        cout << "Труба теперь в ремонте.\n";
+        return true;
+    } else 
+    {
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        return false;
     }
 }
 
-// Функция изменения КС
-void editKS(KS &k) {
-    int vibor;
-    cout << "1. Запустить цех\n";
-    cout << "2. Остановить цех\n";
-    cout << "Ваш выбор: ";
-    cin >> vibor;
-
-    if (vibor == 1) {
-        if (k.cehov_rabot < k.cehov_vsego) {
-            k.cehov_rabot = k.cehov_rabot + 1;
-            cout << "Цех запущен.\n";
-        } else {
-            cout << "Все цеха уже работают.\n";
-        }
-    }
-    else if (vibor == 2) {
-        if (k.cehov_rabot > 0) {
-            k.cehov_rabot = k.cehov_rabot - 1;
-            cout << "Цех остановлен.\n";
-        } else {
-            cout << "Все цеха уже остановлены.\n";
-        }
-    }
-    else {
-        cout << "Неверный выбор.\n";
-    }
-}
-
-// Сохранение в файл
-void save(Truba t, KS k) {
-    string filename;
-    cout << "Введите имя файла: ";
-    cin >> filename;
-
-    ofstream fout(filename);
-    fout << t.name << endl;
-    fout << t.dlina << endl;
-    fout << t.diametr << endl;
-    fout << t.remont << endl;
-    
-    fout << k.name << endl;
-    fout << k.cehov_vsego << endl;
-    fout << k.cehov_rabot << endl;
-    fout << k.klass << endl;
-    
-    fout.close();
-    cout << "Данные сохранены.\n";
-}
-
-// Загрузка из файла
-void load(Truba &t, KS &k) {
-    string filename;
-    cout << "Введите имя файла: ";
-    cin >> filename;
-
-    ifstream fin(filename);
-    if (!fin.is_open()) {
-        cout << "Ошибка! Файл не найден.\n";
-        return;
-    }
-
-    fin >> t.name >> t.dlina >> t.diametr >> t.remont;
-    fin >> k.name >> k.cehov_vsego >> k.cehov_rabot >> k.klass;
-    
-    fin.close();
-    cout << "Данные загружены.\n";
-}
 
 int main() {
     Truba mojaTruba;
@@ -162,36 +63,175 @@ int main() {
         cout << "7. Загрузить\n";
         cout << "0. Выход\n";
         cout << "Выберите пункт: ";
-        cin >> menu;
+        
+        if (!(cin >> menu) || cin.peek() != '\n') 
+        {
+            cout << "Ошибка! Введите число.\n";
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            continue;
+        }
 
-        if (menu == 1) {
-            addTruba(mojaTruba);
+        if (menu == 1) 
+        {
+            cout << "Введите название трубы: ";
+            cin.ignore();
+            getline(cin, mojaTruba.name);
+            
+            cout << "Введите длину (км): ";
+            while (!checkInput(mojaTruba.dlina)) 
+            {
+                cout << "Ошибка! Введите положительное число: ";
+            }
+            
+            cout << "Введите диаметр (мм): ";
+            while (!checkInput(mojaTruba.diametr)) 
+            {
+                cout << "Ошибка! Введите положительное число: ";
+            }
+            
+            mojaTruba.remont = false;
         }
-        else if (menu == 2) {
-            addKS(mojaKS);
+        else if (menu == 2) 
+        {
+            cout << "Введите название КС: ";
+            cin.ignore();
+            getline(cin,mojaKS.name);
+            
+            cout << "Введите количество цехов всего: ";
+            int temp;
+            double temp1;
+            while (!checkInput(temp1))
+            {
+                cout << "Ошибка! Введите положительное число: ";
+            }
+            mojaKS.cehov_vsego = int(temp1);
+            
+            cout << "Введите количество цехов в работе: ";
+            while (true)
+            {
+                while (!checkInputt(temp)) 
+                {
+                cout << "Ошибка! Введите положительное число: ";
+                }
+                if (temp<=mojaKS.cehov_vsego)
+                {
+                    mojaKS.cehov_rabot = temp;
+                    break;
+                }
+                else
+                {
+                cout<<"Цехов в работе должно быть не больше чем цехов всего:";
+                }
+            }         
+            
+            
+            cout << "Введите класс станции: ";
+            while (!checkInputt(temp)) 
+            {
+                cout << "Ошибка! Введите положительное число: ";
+            }
+            mojaKS.klass = temp;
         }
-        else if (menu == 3) {
-            show(mojaTruba, mojaKS);
+        else if (menu == 3) 
+        {
+            cout << "\n--- Труба ---\n";
+            if (mojaTruba.name=="")
+            {
+                cout << "Не существует\n";
+            }
+            else
+            {
+                cout << "Название: " << mojaTruba.name << endl;
+                cout << "Длина: " << mojaTruba.dlina << " км" << endl;
+                cout << "Диаметр: " << mojaTruba.diametr << " мм" << endl;
+                if (mojaTruba.remont) cout << "Статус: В ремонте\n";
+                else cout << "Статус: Работает\n";
+            }
+            cout << "\n--- КС ---\n";
+            if(mojaKS.name=="")
+            {
+                cout<<"Не существует\n";
+            }
+            else
+            {            
+                cout << "Название: " << mojaKS.name << endl;
+                cout << "Цехов всего: " << mojaKS.cehov_vsego << endl;
+                cout << "Цехов в работе: " << mojaKS.cehov_rabot << endl;
+                cout << "Класс: " << mojaKS.klass << endl;
+            }
         }
-        else if (menu == 4) {
-            editTruba(mojaTruba);
+        else if (menu == 4) 
+        {
+            mojaTruba.remont = !mojaTruba.remont;
+            cout << "Статус трубы изменен.\n";
         }
-        else if (menu == 5) {
-            editKS(mojaKS);
+        else if (menu == 5) 
+        {
+            int deistvie;
+            cout << "1. Запустить цех\n2. Остановить цех\nВаш выбор: ";
+            if (!(cin >> deistvie) || cin.peek() != '\n') 
+            {
+                cout << "Ошибка ввода.\n";
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            } else 
+            {
+                if (deistvie == 1 && mojaKS.cehov_rabot < mojaKS.cehov_vsego) {
+                    mojaKS.cehov_rabot++;
+                    cout << "Цех запущен.\n";
+                } else if (deistvie == 2 && mojaKS.cehov_rabot > 0) {
+                    mojaKS.cehov_rabot--;
+                    cout << "Цех остановлен.\n";
+                } else {
+                    cout << "Действие невозможно.\n";
+                }
+            }
         }
-        else if (menu == 6) {
-            save(mojaTruba, mojaKS);
+        else if (menu == 6) 
+        {
+            string filename;
+            cout << "Введите имя файла: ";
+            cin >> filename;
+            ofstream fout(filename);
+            fout << mojaTruba.name << endl;
+            fout << mojaTruba.dlina << endl;
+            fout << mojaTruba.diametr << endl;
+            fout << mojaTruba.remont << endl;
+            fout << mojaKS.name << endl;
+            fout << mojaKS.cehov_vsego << endl;
+            fout << mojaKS.cehov_rabot << endl;
+            fout << mojaKS.klass << endl;
+            fout.close();
+            cout << "Сохранено.\n";
         }
-        else if (menu == 7) {
-            load(mojaTruba, mojaKS);
+        else if (menu == 7) 
+        {
+            string filename;
+            cout << "Введите имя файла: ";
+            cin >> filename;
+            ifstream fin(filename);
+            if (!fin.is_open()) {
+                cout << "Файл не найден.\n";
+            } else 
+            {
+                getline(fin, mojaTruba.name);
+                fin >> mojaTruba.dlina >> mojaTruba.diametr >> mojaTruba.remont;
+                fin.ignore();
+                getline(fin, mojaKS.name);
+                fin >> mojaKS.cehov_vsego >> mojaKS.cehov_rabot >> mojaKS.klass;
+                fin.close();
+                cout << "Загружено.\n";
+            }
         }
-        else if (menu == 0) {
-            cout << "Выход из программы.\n";
+        else if (menu == 0) 
+        {
+            cout << "Выход.\n";
         }
-        else {
-            cout << "Нет такого пункта меню.\n";
+        else 
+        {
+            cout << "Нет такого пункта.\n";
         }
     }
-
     return 0;
 }
