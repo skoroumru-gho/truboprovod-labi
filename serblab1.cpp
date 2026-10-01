@@ -21,31 +21,31 @@ struct KS
     int klass;
 };
 
-bool checkInput(double &x) 
+template <typename T>
+void checkInput(T &x, bool allowZero = false) 
 {
-    if (cin >> x && cin.peek() == '\n' && x > 0) 
+    while (true)
     {
-        return true;
-    } else 
-    {
-        cin.clear();
-        cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
-        return false;
+        if (cin >> x && cin.peek() == '\n') 
+        {
+            if (allowZero) 
+            {
+                if (x >= 0) return;
+            } 
+            else 
+            {
+                if (x > 0) return;
+            }
+            cout << "Ошибка! Число должно быть положительным.\n";
+        }
+        else
+        {
+            cout << "Ошибка! Введите число.\n";
+        }
+    cin.clear();
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
     }
-}
-
-bool checkInputt(int &x) 
-{
-    if (cin >> x && cin.peek() == '\n' && x >= 0) 
-    {
-        return true;
-    } else 
-    {
-        cin.clear();
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-        return false;
-    }
-}
+} 
 
 
 void addTruba(Truba &t) 
@@ -55,17 +55,9 @@ void addTruba(Truba &t)
     getline(cin, t.name);
     
     cout << "Введите длину (км): ";
-    while (!checkInput(t.dlina)) 
-    {
-        cout << "Ошибка! Введите положительное число: ";
-    }
-    
+    checkInput(t.dlina);
     cout << "Введите диаметр (мм): ";
-    while (!checkInput(t.diametr)) 
-    {
-        cout << "Ошибка! Введите положительное число: ";
-    }
-    
+    checkInput(t.diametr);
     t.remont = false;
     cout << "Труба добавлена!\n";
 }
@@ -77,24 +69,13 @@ void addKS(KS &k)
     getline(cin, k.name);
     
     cout << "Введите количество цехов всего: ";
-    int temp;
-    double temp1;
-    while (!checkInput(temp1))
-    {
-        cout << "Ошибка! Введите положительное число: ";
-    }
-    k.cehov_vsego = int(temp1);
-    
+    checkInput(k.cehov_vsego);
     cout << "Введите количество цехов в работе: ";
     while (true)
     {
-        while (!checkInputt(temp)) 
+        checkInput(k.cehov_rabot, true);
+        if (k.cehov_rabot <= k.cehov_vsego)
         {
-            cout << "Ошибка! Введите положительное число: ";
-        }
-        if (temp <= k.cehov_vsego)
-        {
-            k.cehov_rabot = temp;
             break;
         }
         else
@@ -104,22 +85,18 @@ void addKS(KS &k)
     }         
     
     cout << "Введите класс станции: ";
-    while (!checkInputt(temp)) 
-    {
-        cout << "Ошибка! Введите положительное число: ";
-    }
-    k.klass = temp;
+    checkInput(k.klass, true);
     cout << "КС добавлена!\n";
 }
 
-void showAll(Truba t, KS k) 
+void showTruba(Truba t) 
 {
     cout << "\n Труба \n";
-    if (t.name == "")
+    if (t.name == "") 
     {
         cout << "Не существует\n";
-    }
-    else
+    } 
+    else 
     {
         cout << "Название: " << t.name << endl;
         cout << "Длина: " << t.dlina << " км" << endl;
@@ -127,14 +104,17 @@ void showAll(Truba t, KS k)
         if (t.remont) cout << "Статус: В ремонте\n";
         else cout << "Статус: Работает\n";
     }
-    
+}
+
+void showKS(KS k) 
+{
     cout << "\n КС \n";
     if (k.name == "")
     {
         cout << "Не существует\n";
-    }
-    else
-    {            
+    } 
+    else 
+    {
         cout << "Название: " << k.name << endl;
         cout << "Цехов всего: " << k.cehov_vsego << endl;
         cout << "Цехов в работе: " << k.cehov_rabot << endl;
@@ -188,7 +168,7 @@ void editKS(KS &k)
     }
 }
 
-void saveTruba(Truba t, ofstream &fout) 
+void saveTruba(const Truba &t, ofstream &fout) 
 {
     fout << t.name << endl;
     fout << t.dlina << endl;
@@ -196,7 +176,7 @@ void saveTruba(Truba t, ofstream &fout)
     fout << t.remont << endl;
 }
 
-void saveKS(KS k, ofstream &fout) 
+void saveKS(const KS &k, ofstream &fout) 
 {
     fout << k.name << endl;
     fout << k.cehov_vsego << endl;
@@ -257,7 +237,8 @@ int main()
         }
         else if (menu == 3) 
         {
-            showAll(mojaTruba, mojaKS);
+            showTruba(mojaTruba);
+            showKS(mojaKS);
         }
         else if (menu == 4) 
         {
@@ -271,8 +252,9 @@ int main()
         {
             string filename;
             cout << "Введите имя файла: ";
-            cin >> filename;
-    
+            cin.ignore();
+            getline(cin, filename);            
+
             ofstream fout(filename); 
             if (!fout.is_open()) {
                 cout << "Ошибка открытия файла!\n";
@@ -287,7 +269,8 @@ int main()
         {
             string filename;
             cout << "Введите имя файла: ";
-            cin >> filename;
+            cin.ignore();
+            getline(cin, filename);     
             
             ifstream fin(filename);
             if (!fin.is_open()) 
